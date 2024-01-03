@@ -1,0 +1,58 @@
+#+title: preview-tailor: Tailor AUCTeX preview scale to monitor/text scale
+#+author: Paul Nelson
+
+* Overview
+The [[https://www.gnu.org/software/auctex/manual/preview-latex/preview-latex.html][preview]] feature of [[https://www.gnu.org/software/auctex/][AUCTeX]] provides live rendering of TeX code.  The rendering occurs at a user-specified preview scale.  When working with on multiple monitors and at multiple text scales, it becomes necessary to adjust that preview scale.  This package helps automate that adjustment.  It consists primarily of one command, =M-x preview-tailor-set-multiplier=, which interactively adjusts the preview scale for the current monitor.
+
+* Configuration
+Download this repository, install using =M-x package-install-file= (or package-vc-install, straight, elpaca, ...), and add something like the following to your [[https://www.emacswiki.org/emacs/InitFile][init file]]:
+#+begin_src elisp
+(use-package preview-tailor
+  :after latex
+  :config
+  (preview-tailor-init))
+#+end_src
+The function =preview-tailor-init= sets the customization variable =preview-scale-function= to a function internal to this package that provides the calculation, so make sure you don't set the variable =preview-scale-function= elsewhere in your init file.
+
+This package calculates the preview scale by multiplying together three factors:
+
+1. The result of =preview-scale-from-face=.
+2. The current text scale factor (as tweaked via the =text-scale-adjust= commands bound by default to =C-x C-+= and =C-x C--=)
+3. A multiplier determined by the current frame's monitor attributes, with default value 1.
+
+To adjust the multiplier for a given monitor, use =M-x preview-tailor-set-multiplier=.  This adjusts the customization variable =preview-tailor-multipliers=, which is an association list mapping lists of monitor attributes to numbers.  The multiplier is calculated by finding the first entry in the list all of whose attributes match the current ones.
+
+* Notes
+If you've disabled the built-in customization features, then you might want to store the multipliers in your init file.  Here's what I have:
+#+begin_src elisp
+(use-package preview-tailor
+  :elpaca (:host github :repo "ultronozm/preview-tailor.el"
+                 :depth nil)
+  :after latex
+  :config
+  (preview-tailor-init)
+  :custom
+  (preview-tailor-multipliers
+   '((((geometry 0 -2520 1920 1080)
+       (workarea 0 -2520 1920 1080)
+       (mm-size 1434 806)
+       (source . "NS"))
+      . 4)
+     (((geometry -832 -1440 2560 1440)
+       (workarea -832 -1440 2560 1440)
+       (mm-size 602 338)
+       (source . "NS"))
+      . 1.2)
+     (((geometry 0 0 1728 1117)
+       (workarea 0 32 1728 1085)
+       (mm-size 344 222)
+       (source . "NS"))
+      . 1.2)
+     (((geometry 0 -1440 2560 1440)
+       (workarea 0 -1440 2560 1440)
+       (mm-size 602 338)
+       (source . "NS"))
+      . 1.2)
+     (nil . 1.2))))
+#+end_src
+When I want to modify this, I use =preview-tailor-set-multiplier= and then copy the new value of =preview-tailor-multipliers= into the above.

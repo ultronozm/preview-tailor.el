@@ -31,31 +31,29 @@
 (require 'face-remap)
 (require 'preview)
 
-(defcustom preview-tailor-scales
+(defcustom preview-tailor-multipliers
   '((() . 1.0))
 
-  "Alist that maps lists of monitor attributes to preview scales.
+  "Alist mapping lists of monitor attributes to multipliers.
 
-Each monitor is described by a list of its attributes.  This
+Each monitor is described by a list of its attributes, which
 should be a subset of those returned by
-calling (frame-monitor-attributes).
-
-The empty list () serves as a default, since it matches
-everything."
+`frame-monitor-attributes'.  The empty list of attributes ()
+matches against everything, hence functions as a default."
   :group 'AUCTeX
   :type '(alist :key-type (repeat (sexp  :tag "Monitor Attribute"))
                 :value-type (number :tag "Preview Scale")))
 
 (defun preview-tailor--get-match (attr-list)
   "Return preview scale corresponding to attribute list ATTR-LIST.
-Uses the customization variable `preview-tailor-scales'.  Returns nil if no
-match found."
+Uses the customization variable `preview-tailor-multipliers'.  Returns
+nil if no match found."
   (cl-find-if (lambda (pair)
                 (let ((monitor-attr-list (car pair)))
                   (cl-every (lambda (attr)
                               (member attr attr-list))
                             monitor-attr-list)))
-              preview-tailor-scales))
+              preview-tailor-multipliers))
 
 (defun preview-tailor--get-multiplier ()
   "Get the preview scale multiplier for the current monitor."
@@ -63,8 +61,8 @@ match found."
       1.5))
 
 (defun preview-tailor--calculate ()
-  "Calculate the AUCTeX preview multiplier.
-Returns the product of the following three factors:
+  "Calculate the AUCTeX preview scale.
+We take this to be the product of three factors:
 
 - the result of preview-scale-from-face
 
@@ -72,7 +70,7 @@ Returns the product of the following three factors:
   `text-scale-adjust')
 
 - the multiplier for the current monitor, determined via the
-  alist `preview-tailor-scales'."
+  alist `preview-tailor-multipliers'."
   (*
    (funcall (preview-scale-from-face))
    (expt text-scale-mode-step text-scale-mode-amount)
@@ -93,14 +91,15 @@ Use SCALE if provided, otherwise prompt for it."
                 (read-number (format "Enter multiplier (current: %s): "
                                      (preview-tailor--get-multiplier)))))
   (let* ((attr (preview-tailor--remove-frames (frame-monitor-attributes))))
-    (if-let ((item (assoc attr preview-tailor-scales 'equal)))
+    (if-let ((item (assoc attr preview-tailor-multipliers 'equal)))
         (setcdr item scale)
-      (add-to-list 'preview-tailor-scales (cons attr scale)))))
+      (add-to-list 'preview-tailor-multipliers (cons attr scale)))))
 
 ;;;###autoload
 (defun preview-tailor-init ()
   "Initialize preview-tailor."
-  (setq preview-scale-function 'preview-tailor--calculate))
+  (interactive)
+  (setq preview-scale-function #'preview-tailor--calculate))
 
 (provide 'preview-tailor)
 ;;; preview-tailor.el ends here
