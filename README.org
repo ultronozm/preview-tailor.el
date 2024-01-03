@@ -12,7 +12,7 @@ Download this repository, install using =M-x package-install-file= (or package-v
   :config
   (preview-tailor-init))
 #+end_src
-The function =preview-tailor-init= sets the customization variable =preview-scale-function= to a function internal to this package that provides the calculation, so make sure you don't set the variable =preview-scale-function= elsewhere in your init file.
+The function =preview-tailor-init= sets the customization variable =preview-scale-function= to a function internal to this package that provides the calculation, so make sure you don't modify that variable elsewhere in your init file.
 
 This package calculates the preview scale by multiplying together three factors:
 

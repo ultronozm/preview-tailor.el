@@ -35,7 +35,6 @@
   '((() . 1.0))
 
   "Alist mapping lists of monitor attributes to multipliers.
-
 Each monitor is described by a list of its attributes, which
 should be a subset of those returned by
 `frame-monitor-attributes'.  The empty list of attributes ()
