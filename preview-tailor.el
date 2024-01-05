@@ -100,5 +100,11 @@ Use SCALE if provided, otherwise prompt for it."
   (interactive)
   (setq preview-scale-function #'preview-tailor--calculate))
 
+;;;###autoload
+(defun preview-tailor-save ()
+  "Save preview-tailor customization."
+  (interactive)
+  (customize-save-variable 'preview-tailor-multipliers preview-tailor-multipliers))
+
 (provide 'preview-tailor)
 ;;; preview-tailor.el ends here
