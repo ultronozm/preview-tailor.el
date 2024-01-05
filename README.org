@@ -24,7 +24,7 @@ This package calculates the preview scale by multiplying together three factors:
 To adjust the multiplier for a given monitor, use =M-x preview-tailor-set-multiplier=.  This adjusts the customization variable =preview-tailor-multipliers=, which is an association list mapping lists of monitor attributes to numbers.  The multiplier is calculated by finding the first entry in the list all of whose attributes match the current ones.
 
 * Saving your settings
-If you use the built-in customization feature, then you can save your multipliers for future sessions using =M-x preview-tailor-save=.
+If you use the built-in customization feature, then you can save your multipliers for future sessions using =M-x preview-tailor-save=.  To make this automatic, you could add =(add-hook 'kill-emacs-hook #'preview-tailor-save)= to your init file.
 
 If you've disabled the built-in customization feature, then you can save the multipliers in your init file.  Here's what I do:
 #+begin_src elisp
