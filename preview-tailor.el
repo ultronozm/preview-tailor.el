@@ -59,21 +59,53 @@ nil if no match found."
   (or (cdr (preview-tailor--get-match (frame-monitor-attributes)))
       1.5))
 
+(defcustom preview-tailor-additional-factor-function nil
+  "Function to calculate an additional factor for preview scale.
+This function should take no arguments and returns a number. The
+returned number is used as a multiplication factor in
+`preview-tailor--calculate'.  If nil, then the no additional
+factor is used."
+  :group 'AUCTeX
+  :type '(choice (const :tag "None" nil)
+                 (function :tag "Function" identity)))
+
 (defun preview-tailor--calculate ()
   "Calculate the AUCTeX preview scale.
-We take this to be the product of three factors:
+This calculation is based on four factors:
 
-- the result of preview-scale-from-face
+- Result of `preview-scale-from-face'.
 
-- the current text scale factor (e.g., tweaked via
-  `text-scale-adjust')
+- Current text scale factor (adjusted via `text-scale-adjust').
 
-- the multiplier for the current monitor, determined via the
-  alist `preview-tailor-multipliers'."
+- Multiplier from `preview-tailor-multipliers' for current
+  monitor.
+
+- Result of `preview-tailor-additional-factor-function', if
+  non-nil."
+  (let* ((face-scale (funcall (preview-scale-from-face)))
+         (text-scale (expt text-scale-mode-step text-scale-mode-amount))
+         (monitor-multiplier (preview-tailor--get-multiplier))
+         (additional-factor (or (and preview-tailor-additional-factor-function
+                                     (funcall preview-tailor-additional-factor-function))
+                                1)))
+    (* preview-scale text-scale monitor-multiplier additional-factor)))
+
+(defun preview-tailor--calculate ()
+  "Calculate scale for AUCTeX previews.
+Product of four factors:
+- Result of `preview-scale-from-face'.
+- Current text scale factor (adjusted via `text-scale-adjust').
+- Multiplier from `preview-tailor-multipliers' for current
+  monitor.
+- Result of `preview-tailor-additional-factor-function', if
+  non-nil."
   (*
    (funcall (preview-scale-from-face))
    (expt text-scale-mode-step text-scale-mode-amount)
-   (preview-tailor--get-multiplier)))
+   (preview-tailor--get-multiplier)
+   (if preview-tailor-additional-factor-function
+       (funcall preview-tailor-additional-factor-function)
+     1)))
 
 (defun preview-tailor--remove-frames (attr)
   "Remove the `frames' entry from the list ATTR."

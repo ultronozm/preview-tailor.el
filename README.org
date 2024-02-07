@@ -15,11 +15,12 @@ Download this repository, install using =M-x package-install-file= (or package-v
 The function =preview-tailor-init= sets the customization variable =preview-scale-function= to a function internal to this package that provides the calculation, so make sure you don't modify that variable elsewhere in your init file.
 
 * Usage
-This package calculates the preview scale by multiplying together three factors:
+This package calculates the preview scale by multiplying together four factors:
 
 1. The result of =preview-scale-from-face=.
 2. The current text scale factor (as tweaked via the =text-scale-adjust= commands bound by default to =C-x C-+= and =C-x C--=)
 3. A multiplier determined by the current frame's monitor attributes, with default value 1.
+4. An additional factor provided by the user customization =preview-tailor-additional-factor-function= (which defaults to nil, which means to omit this factor).
 
 To adjust the multiplier for a given monitor, use =M-x preview-tailor-set-multiplier=.  This adjusts the customization variable =preview-tailor-multipliers=, which is an association list mapping lists of monitor attributes to numbers.  The multiplier is calculated by finding the first entry in the list all of whose attributes match the current ones.
 
