@@ -5,7 +5,7 @@
 ;; Author: Paul D. Nelson <nelson.paul.david@gmail.com>
 ;; Version: 0.0
 ;; URL: https://github.com/ultronozm/preview-tailor.el
-;; Package-Requires: ((emacs "29.1"))
+;; Package-Requires: ((emacs "29.1") (auctex))
 ;; Keywords: tex, multimedia
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -29,6 +29,7 @@
 ;;; Code:
 
 (require 'face-remap)
+(require 'latex)
 (require 'preview)
 
 (defcustom preview-tailor-multipliers
@@ -68,27 +69,6 @@ factor is used."
   :group 'AUCTeX
   :type '(choice (const :tag "None" nil)
                  (function :tag "Function" identity)))
-
-(defun preview-tailor--calculate ()
-  "Calculate the AUCTeX preview scale.
-This calculation is based on four factors:
-
-- Result of `preview-scale-from-face'.
-
-- Current text scale factor (adjusted via `text-scale-adjust').
-
-- Multiplier from `preview-tailor-multipliers' for current
-  monitor.
-
-- Result of `preview-tailor-additional-factor-function', if
-  non-nil."
-  (let* ((face-scale (funcall (preview-scale-from-face)))
-         (text-scale (expt text-scale-mode-step text-scale-mode-amount))
-         (monitor-multiplier (preview-tailor--get-multiplier))
-         (additional-factor (or (and preview-tailor-additional-factor-function
-                                     (funcall preview-tailor-additional-factor-function))
-                                1)))
-    (* preview-scale text-scale monitor-multiplier additional-factor)))
 
 (defvar-local preview-tailor-local-multiplier 1.0
   "Local preview scale multiplier.
