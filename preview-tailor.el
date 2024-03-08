@@ -90,29 +90,35 @@ This calculation is based on four factors:
                                 1)))
     (* preview-scale text-scale monitor-multiplier additional-factor)))
 
+(defvar-local preview-tailor-local-multiplier 1.0
+  "Local preview scale multiplier.
+Intended for use in buffer-local settings.")
+
 (defun preview-tailor--calculate ()
   "Calculate scale for AUCTeX previews.
-Product of four factors:
+Product of five factors:
 - Result of `preview-scale-from-face'.
 - Current text scale factor (adjusted via `text-scale-adjust').
 - Multiplier from `preview-tailor-multipliers' for current
   monitor.
 - Result of `preview-tailor-additional-factor-function', if
-  non-nil."
+  non-nil.
+- The buffer-local variable `preview-tailor-local-multiplier'."
   (*
    (funcall (preview-scale-from-face))
    (expt text-scale-mode-step text-scale-mode-amount)
    (preview-tailor--get-multiplier)
    (if preview-tailor-additional-factor-function
        (funcall preview-tailor-additional-factor-function)
-     1)))
+     1)
+   preview-tailor-local-multiplier))
 
 (defun preview-tailor--remove-frames (attr)
   "Remove the `frames' entry from the list ATTR."
   (seq-remove (lambda (item)
-               (and (listp item)
-                    (eq (car item) 'frames)))
-             attr))
+                (and (listp item)
+                     (eq (car item) 'frames)))
+              attr))
 
 ;;;###autoload
 (defun preview-tailor-set-multiplier (&optional scale)
