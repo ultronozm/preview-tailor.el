@@ -3,7 +3,7 @@
 ;; Copyright (C) 2024  Paul D. Nelson
 
 ;; Author: Paul D. Nelson <nelson.paul.david@gmail.com>
-;; Version: 0.0
+;; Version: 0.1
 ;; URL: https://github.com/ultronozm/preview-tailor.el
 ;; Package-Requires: ((emacs "29.1") (auctex))
 ;; Keywords: tex, multimedia
@@ -32,17 +32,14 @@
 (require 'latex)
 (require 'preview)
 
-(defcustom preview-tailor-multipliers
+(defvar preview-tailor-multipliers
   '((() . 1.0))
 
   "Alist mapping lists of monitor attributes to multipliers.
 Each monitor is described by a list of its attributes, which
 should be a subset of those returned by
 `frame-monitor-attributes'.  The empty list of attributes ()
-matches against everything, hence functions as a default."
-  :group 'AUCTeX
-  :type '(alist :key-type (repeat (sexp  :tag "Monitor Attribute"))
-                :value-type (number :tag "Preview Scale")))
+matches against everything, hence functions as a default.")
 
 (defun preview-tailor--get-match (attr-list)
   "Return preview scale corresponding to attribute list ATTR-LIST.
@@ -62,7 +59,7 @@ nil if no match found."
 
 (defcustom preview-tailor-additional-factor-function nil
   "Function to calculate an additional factor for preview scale.
-This function should take no arguments and returns a number. The
+This function should take no arguments and returns a number.  The
 returned number is used as a multiplication factor in
 `preview-tailor--calculate'.  If nil, then the no additional
 factor is used."
@@ -112,17 +109,30 @@ Use SCALE if provided, otherwise prompt for it."
         (setcdr item scale)
       (add-to-list 'preview-tailor-multipliers (cons attr scale)))))
 
+(defconst preview-tailor-storage-file
+  (expand-file-name ".preview-tailor" user-emacs-directory)
+  "File name where settings are stored.")
+
+(defun preview-tailor-load ()
+  "Load preview-tailor customization from a dotfile."
+  (when (file-exists-p preview-tailor-storage-file)
+    (with-temp-buffer
+      (insert-file-contents preview-tailor-storage-file)
+      (setq preview-tailor-multipliers (read (current-buffer))))))
+
 ;;;###autoload
 (defun preview-tailor-init ()
   "Initialize preview-tailor."
   (interactive)
+  (preview-tailor-load)
   (setq preview-scale-function #'preview-tailor--calculate))
 
 ;;;###autoload
 (defun preview-tailor-save ()
-  "Save preview-tailor customization."
+  "Save preview-tailor customization to a dotfile."
   (interactive)
-  (customize-save-variable 'preview-tailor-multipliers preview-tailor-multipliers))
+  (with-temp-file preview-tailor-storage-file
+    (prin1 preview-tailor-multipliers (current-buffer))))
 
 (provide 'preview-tailor)
 ;;; preview-tailor.el ends here

@@ -26,38 +26,12 @@ This package calculates the preview scale by multiplying together four factors:
 To adjust the multiplier for a given monitor, use =M-x preview-tailor-set-multiplier=.  This adjusts the customization variable =preview-tailor-multipliers=, which is an association list mapping lists of monitor attributes to numbers.  The multiplier is calculated by finding the first entry in the list all of whose attributes match the current ones.
 
 * Saving your settings
-If you use the built-in customization feature, then you can save your multipliers for future sessions using =M-x preview-tailor-save=.  To make this automatic, you could add =(add-hook 'kill-emacs-hook #'preview-tailor-save)= to your init file.
+The package stores your monitor-specific settings in the dotfile ".preview-tailor" inside your user-emacs-directory.  This allows you to keep your settings separate from your init file, making it easier to sync your Emacs configuration across different computers.
 
-If you've disabled the built-in customization feature, then you can save the multipliers in your init file.  Here's what I do:
+To save your multipliers for future sessions, use =M-x preview-tailor-save=.  The package will automatically load the settings from the dotfile when initialized.  To make saving automatic, you can add the following to your init file:
+
 #+begin_src elisp
-(use-package preview-tailor
-  :elpaca (:host github :repo "ultronozm/preview-tailor.el"
-                 :depth nil)
-  :after latex
-  :config
-  (preview-tailor-init)
-  :custom
-  (preview-tailor-multipliers
-   '((((geometry 0 -2520 1920 1080)
-       (workarea 0 -2520 1920 1080)
-       (mm-size 1434 806)
-       (source . "NS"))
-      . 4)
-     (((geometry -832 -1440 2560 1440)
-       (workarea -832 -1440 2560 1440)
-       (mm-size 602 338)
-       (source . "NS"))
-      . 1.2)
-     (((geometry 0 0 1728 1117)
-       (workarea 0 32 1728 1085)
-       (mm-size 344 222)
-       (source . "NS"))
-      . 1.2)
-     (((geometry 0 -1440 2560 1440)
-       (workarea 0 -1440 2560 1440)
-       (mm-size 602 338)
-       (source . "NS"))
-      . 1.2)
-     (nil . 1.2))))
+(add-hook 'kill-emacs-hook #'preview-tailor-save)
 #+end_src
-When I want to modify this, I use =preview-tailor-set-multiplier= and then copy the new value of =preview-tailor-multipliers= into the above.
+
+If you prefer to edit the dotfile directly, the function =preview-tailor-load= might be come in handy -- it loads the settings from the dotfile into the variable =preview-tailor-multipliers=.
