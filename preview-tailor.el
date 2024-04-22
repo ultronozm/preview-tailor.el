@@ -25,6 +25,16 @@
 
 ;; This package provides customization for AUCTeX preview scale based
 ;; on the monitor and text scale.
+;;
+;; To use it, add (preview-tailor-init) to your init file.  When you
+;; want to change the preview scale for a given monitor, use
+;;
+;;   M-x preview-tailor-set-multiplier
+;;
+;; When you are happy with your settings and want to save them for
+;; future sessions, use
+;;
+;;   M-x preview-tailor-save
 
 ;;; Code:
 
