@@ -32,6 +32,10 @@
 (require 'latex)
 (require 'preview)
 
+(defgroup preview-tailor nil
+  "Tailor AUCTeX preview scale to monitor/text scale."
+  :group 'preview)
+
 (defvar preview-tailor-multipliers
   '((() . 1.0))
 
@@ -41,28 +45,29 @@ should be a subset of those returned by
 `frame-monitor-attributes'.  The empty list of attributes ()
 matches against everything, hence functions as a default.")
 
-(defun preview-tailor--get-match (attr-list)
-  "Return preview scale corresponding to attribute list ATTR-LIST.
+(defun preview-tailor--get-match (attribute-list)
+  "Return preview scale corresponding to ATTRIBUTE-LIST.
 Uses the customization variable `preview-tailor-multipliers'.  Returns
 nil if no match found."
   (cl-find-if (lambda (pair)
                 (let ((monitor-attr-list (car pair)))
                   (cl-every (lambda (attr)
-                              (member attr attr-list))
+                              (member attr attribute-list))
                             monitor-attr-list)))
               preview-tailor-multipliers))
 
 (defun preview-tailor--get-multiplier ()
   "Get the preview scale multiplier for the current monitor."
   (or (cdr (preview-tailor--get-match (frame-monitor-attributes)))
-      1.5))
+      ;; the above should match unless the user deletes the default
+      ;; entry in `preview-tailor-multipliers'
+      1.0))
 
 (defcustom preview-tailor-additional-factor-function nil
   "Function to calculate an additional factor for preview scale.
-This function should take no arguments and returns a number.  The
-returned number is used as a multiplication factor in
-`preview-tailor--calculate'.  If nil, then the no additional
-factor is used."
+This function should take no arguments and return a number.  The
+returned number, if non-nil, is used as a factor in
+`preview-tailor--calculate'."
   :group 'AUCTeX
   :type '(choice (const :tag "None" nil)
                  (function :tag "Function" identity)))
