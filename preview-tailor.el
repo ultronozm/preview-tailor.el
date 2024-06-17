@@ -35,6 +35,8 @@
 ;; future sessions, use
 ;;
 ;;   M-x preview-tailor-save
+;;
+;; See README.org for further details.
 
 ;;; Code:
 
