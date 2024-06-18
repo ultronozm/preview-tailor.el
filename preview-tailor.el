@@ -137,19 +137,24 @@ Use SCALE if provided, otherwise prompt for it."
       (insert-file-contents preview-tailor-storage-file)
       (setq preview-tailor-multipliers (read (current-buffer))))))
 
+(defvar preview-tailor--initialized nil
+  "Non-nil if preview-tailor has been initialized.")
+
 ;;;###autoload
 (defun preview-tailor-init ()
   "Initialize preview-tailor."
   (interactive)
   (preview-tailor-load)
-  (setq preview-scale-function #'preview-tailor--calculate))
+  (setq preview-scale-function #'preview-tailor--calculate)
+  (setq preview-tailor--initialized t))
 
 ;;;###autoload
 (defun preview-tailor-save ()
   "Save preview-tailor customization to a dotfile."
   (interactive)
-  (with-temp-file preview-tailor-storage-file
-    (prin1 preview-tailor-multipliers (current-buffer))))
+  (when preview-tailor--initialized
+    (with-temp-file preview-tailor-storage-file
+      (prin1 preview-tailor-multipliers (current-buffer)))))
 
 (provide 'preview-tailor)
 ;;; preview-tailor.el ends here
