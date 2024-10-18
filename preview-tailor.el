@@ -43,6 +43,7 @@
 (require 'face-remap)
 (require 'latex)
 (require 'preview)
+(require 'seq)
 
 (defgroup preview-tailor nil
   "Tailor AUCTeX preview scale to monitor/text scale."
@@ -61,12 +62,12 @@ matches against everything, hence functions as a default.")
   "Return preview scale corresponding to ATTRIBUTE-LIST.
 Uses the customization variable `preview-tailor-multipliers'.  Returns
 nil if no match found."
-  (cl-find-if (lambda (pair)
-                (let ((monitor-attr-list (car pair)))
-                  (cl-every (lambda (attr)
-                              (member attr attribute-list))
-                            monitor-attr-list)))
-              preview-tailor-multipliers))
+  (seq-find (lambda (pair)
+              (let ((monitor-attr-list (car pair)))
+                (seq-every-p (lambda (attr)
+                               (member attr attribute-list))
+                             monitor-attr-list)))
+            preview-tailor-multipliers))
 
 (defun preview-tailor--get-multiplier ()
   "Get the preview scale multiplier for the current monitor."
