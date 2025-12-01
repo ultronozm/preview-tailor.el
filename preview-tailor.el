@@ -71,7 +71,7 @@ nil if no match found."
 
 (defun preview-tailor--get-multiplier ()
   "Get the preview scale multiplier for the current monitor."
-  (or (cdr (preview-tailor--get-match (frame-monitor-attributes)))
+  (or (cdr-safe (preview-tailor--get-match (frame-monitor-attributes)))
       ;; the above should match unless the user deletes the default
       ;; entry in `preview-tailor-multipliers'
       1.0))
@@ -150,12 +150,15 @@ Use SCALE if provided, otherwise prompt for it."
   (setq preview-tailor--initialized t))
 
 ;;;###autoload
-(defun preview-tailor-save ()
-  "Save preview-tailor customization to a dotfile."
-  (interactive)
-  (when preview-tailor--initialized
-    (with-temp-file preview-tailor-storage-file
-      (prin1 preview-tailor-multipliers (current-buffer)))))
+  (defun preview-tailor-save ()
+    "Save preview-tailor customization to a dotfile."
+    (interactive)
+    (when preview-tailor--initialized
+      (with-temp-file preview-tailor-storage-file
+        (let ((print-length nil)
+              (print-level nil)
+              (print-quoted t))
+          (prin1 preview-tailor-multipliers (current-buffer))))))
 
 (provide 'preview-tailor)
 ;;; preview-tailor.el ends here
