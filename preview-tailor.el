@@ -3,7 +3,7 @@
 ;; Copyright (C) 2024  Free Software Foundation, Inc.
 
 ;; Author: Paul D. Nelson <nelson.paul.david@gmail.com>
-;; Version: 0.2
+;; Version: 0.2.1
 ;; URL: https://github.com/ultronozm/preview-tailor.el
 ;; Package-Requires: ((emacs "29.1") (auctex))
 ;; Keywords: tex, multimedia
